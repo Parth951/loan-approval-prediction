@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Loan Approval Prediction</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <style>
+        :root {
+            --brand-primary: #0ea5e9;
+            --brand-dark: #0b1220;
+            --card-bg: rgba(255, 255, 255, 0.9);
+        }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1e3a8a 0%, #0ea5e9 100%) fixed;
+            background-size: cover;
+        }
+        .page-wrapper {
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+        }
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: saturate(180%) blur(8px);
+            -webkit-backdrop-filter: saturate(180%) blur(8px);
+            border: 1px solid rgba(255,255,255,0.5);
+            box-shadow: 0 10px 30px rgba(2, 8, 20, 0.25);
+        }
+        .form-section-title {
+            font-weight: 600;
+        }
+        .brand-gradient-text {
+            background: linear-gradient(90deg, #0284c7, #22d3ee);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .footer {
+            color: rgba(255,255,255,0.8);
+        }
+        .btn-brand {
+            background: linear-gradient(90deg, #0284c7, #06b6d4);
+            border: none;
+        }
+        .btn-brand:hover { filter: brightness(0.95); }
+    </style>
+    {% set _ = inputs.get('dummy_access', '') %}
+    {% if prediction is defined %}
+        {% set pred_str = (prediction|string) %}
+        {% set pred_low = pred_str|lower %}
+        {% set positive = pred_low in ['y','yes','approved','1','true','approve','loan approved'] %}
+    {% endif %}
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background: rgba(2,6,23,0.6)">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <i class="bi bi-bank2 me-2"></i>
+                Loan Predictor
+            </a>
+        </div>
+    </nav>
+
+    <div class="container page-wrapper">
+        <div class="row justify-content-center">
+            <div class="col-lg-9 col-xl-8">
+                
+
+                {% if error %}
+                <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    {{ error }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
+                <div class="card glass-card border-0">
+                    <div class="card-header bg-transparent py-3 px-4">
+                        <h3 class="mb-0 fw-semibold text-dark">
+                            <span class="brand-gradient-text">Loan Approval Prediction</span>
+                        </h3>
+                        <small class="text-muted">Fill in applicant, financial, and loan details to get a prediction.</small>
+                    </div>
+                    <div class="card-body p-4">
+                        <form method="POST" action="/" id="predictForm" novalidate>
+                            <div class="mb-4">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+            <label for="Loan_ID" class="form-label">Loan ID</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-hash"></i></span>
+                                            <input type="text" class="form-control" id="Loan_ID" name="Loan_ID" placeholder="e.g., LP001002" value="{{ inputs.get('Loan_ID','') }}" required>
+                                        </div>
+        </div>
+                                    <div class="col-md-3">
+            <label for="Gender" class="form-label">Gender</label>
+            <select class="form-select" name="Gender" id="Gender" required>
+                                            <option value="" disabled {% if not inputs.get('Gender') %}selected{% endif %}>Select</option>
+                <option value="Male" {% if inputs.get('Gender') == 'Male' %}selected{% endif %}>Male</option>
+                <option value="Female" {% if inputs.get('Gender') == 'Female' %}selected{% endif %}>Female</option>
+            </select>
+        </div>
+                                    <div class="col-md-3">
+            <label for="Married" class="form-label">Married</label>
+            <select class="form-select" name="Married" id="Married" required>
+                <option value="" disabled {% if not inputs.get('Married') %}selected{% endif %}>Select</option>
+                <option value="Yes" {% if inputs.get('Married') == 'Yes' %}selected{% endif %}>Yes</option>
+                <option value="No" {% if inputs.get('Married') == 'No' %}selected{% endif %}>No</option>
+            </select>
+        </div>
+
+                                    <div class="col-md-3">
+                                        <label for="Dependents" class="form-label">Dependents</label>
+                                        <input type="number" min="0" class="form-control" id="Dependents" name="Dependents" placeholder="0" value="{{ inputs.get('Dependents','') }}" required>
+        </div>
+                                    <div class="col-md-5">
+            <label for="Education" class="form-label">Education</label>
+            <select class="form-select" name="Education" id="Education" required>
+                <option value="" disabled {% if not inputs.get('Education') %}selected{% endif %}>Select Education</option>
+                <option value="Graduate" {% if inputs.get('Education') == 'Graduate' %}selected{% endif %}>Graduate</option>
+                <option value="Not Graduate" {% if inputs.get('Education') == 'Not Graduate' %}selected{% endif %}>Not Graduate</option>
+            </select>
+        </div>
+                                    <div class="col-md-4">
+            <label for="Self_Employed" class="form-label">Self Employed</label>
+            <select class="form-select" name="Self_Employed" id="Self_Employed" required>
+                <option value="" disabled {% if not inputs.get('Self_Employed') %}selected{% endif %}>Select</option>
+                <option value="Yes" {% if inputs.get('Self_Employed') == 'Yes' %}selected{% endif %}>Yes</option>
+                <option value="No" {% if inputs.get('Self_Employed') == 'No' %}selected{% endif %}>No</option>
+            </select>
+        </div>
+                                </div>
+        </div>
+
+                            <hr class="my-4" />
+                            <h6 class="form-section-title mb-3 text-secondary"><i class="bi bi-cash-coin me-1"></i> Financial</h6>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="ApplicantIncome" class="form-label">
+                                            <i class="bi bi-cash-coin"></i>
+                                            Applicant Income/year
+                                        </label>
+                                        <input type="number" class="form-control" id="ApplicantIncome" name="ApplicantIncome" 
+                                               value="{{ inputs.get('ApplicantIncome', '') }}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="CoapplicantIncome" class="form-label">
+                                            <i class="bi bi-cash-coin"></i>
+                                            Co-applicant Income/year
+                                        </label>
+                                        <input type="number" class="form-control" id="CoapplicantIncome" name="CoapplicantIncome" 
+                                               value="{{ inputs.get('CoapplicantIncome', '') }}" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h6 class="form-section-title mb-3 text-secondary"><i class="bi bi-file-earmark-text me-1"></i> Loan Details</h6>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+            <label for="LoanAmount" class="form-label">Loan Amount</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-123"></i></span>
+                                        <input type="number" min="0" step="0.01" class="form-control" id="LoanAmount" name="LoanAmount" placeholder="e.g., 12000" value="{{ inputs.get('LoanAmount','') }}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="Loan_Amount_Term" class="form-label">Term (days)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+                                        <input type="number" min="0" step="0.01" class="form-control" id="Loan_Amount_Term" name="Loan_Amount_Term" placeholder="e.g., 360" value="{{ inputs.get('Loan_Amount_Term','') }}" required>
+        </div>
+        </div>
+                                <div class="col-md-4">
+            <label for="Credit_History" class="form-label">Credit History</label>
+            <select class="form-select" name="Credit_History" id="Credit_History" required>
+                <option value="" disabled {% if not inputs.get('Credit_History') %}selected{% endif %}>Select</option>
+                <option value="1" {% if inputs.get('Credit_History') == '1' or inputs.get('Credit_History')==1 %}selected{% endif %}>Good</option>
+                <option value="0" {% if inputs.get('Credit_History') == '0' or inputs.get('Credit_History')==0 %}selected{% endif %}>Bad</option>
+            </select>
+        </div>
+                                <div class="col-md-6">
+            <label for="Property_Area" class="form-label">Property Area</label>
+            <select class="form-select" name="Property_Area" id="Property_Area" required>
+                <option value="" disabled {% if not inputs.get('Property_Area') %}selected{% endif %}>Select</option>
+                <option value="Urban" {% if inputs.get('Property_Area') == 'Urban' %}selected{% endif %}>Urban</option>
+                <option value="Semiurban" {% if inputs.get('Property_Area') == 'Semiurban' %}selected{% endif %}>Semiurban</option>
+                <option value="Rural" {% if inputs.get('Property_Area') == 'Rural' %}selected{% endif %}>Rural</option>
+            </select>
+                                </div>
+        </div>
+
+                            <div class="d-grid mt-4">
+                                <button type="submit" class="btn btn-brand btn-lg text-white" id="submitBtn">
+                                    <span class="btn-text"><i class="bi bi-magic me-2"></i>Predict</span>
+                                    <span class="btn-spinner d-none"><span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Predicting…</span>
+                                </button>
+                            </div>
+    </form>
+                    </div>
+                </div>
+                <div class="text-center mt-3 footer small">
+                    <i class="bi bi-shield-check"></i> Your inputs are processed securely on this device/server.
+                </div>
+            </div>
+        </div>
+</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        (function () {
+            const form = document.getElementById('predictForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = submitBtn?.querySelector('.btn-text');
+            const btnSpinner = submitBtn?.querySelector('.btn-spinner');
+
+            form?.addEventListener('submit', function () {
+                if (submitBtn && btnText && btnSpinner) {
+                    submitBtn.disabled = true;
+                    btnText.classList.add('d-none');
+                    btnSpinner.classList.remove('d-none');
+                }
+            }, { passive: true });
+        })();
+    </script>
+</body>
+</html>
